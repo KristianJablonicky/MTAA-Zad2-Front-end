@@ -1,9 +1,12 @@
 package mtaa.java;
 
+import android.content.DialogInterface;
+import android.os.Build;
 import android.os.Bundle;
 
 import com.google.android.material.snackbar.Snackbar;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.StrictMode;
@@ -22,7 +25,9 @@ import android.widget.Button;
 import android.util.Log;
 import android.widget.EditText;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -30,11 +35,27 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
-
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
+
+
+    public void popupMessage(String sprava, String nadpis){
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setMessage(sprava);
+        alertDialogBuilder.setTitle(nadpis);
+        alertDialogBuilder.setNegativeButton("ok", new DialogInterface.OnClickListener(){
+
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Log.d(nadpis,"Ok button stlaceny");
+            }
+        });
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,50 +77,87 @@ public class MainActivity extends AppCompatActivity {
                 String heslo = hesloInput.getText().toString();
                 URL url = null;
 
+
+
                 StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
                 StrictMode.setThreadPolicy(policy); // habadura zarucujuca funkcnost
 
-                try{
-                    //url = new URL("http://0.0.0.0:8000/getUser/" + meno + "/" + heslo + "/");
-                    url = new URL("http://127.0.0.1:8000/getUser/" + meno + "/" + heslo + "/");
+                try {
+                    url = new URL("http://192.168.219.127:8000/getUser/" + meno + "/" + heslo + "/");
 
-                }catch(MalformedURLException e){
+                } catch (MalformedURLException e) {
                     Log.i("URL error", "new URL hodil exception");
                     e.printStackTrace();
                 }
 
                 HttpURLConnection con = null;
+                BufferedReader vysledok = null;
+                try {
+                    con = (HttpURLConnection) url.openConnection();
+                    con.setRequestMethod("GET");
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    //skopirovane z netu
+                    con.setDoInput(true);
+                    //con.setDoOutput(true);
+                    InputStreamReader input = new InputStreamReader(con.getInputStream()); //tuna to crashne
+                    vysledok = new BufferedReader(input);
+                    Log.i("InputStreamReader", "ok");
+                    Log.i("InputStreamReader", vysledok.toString());
+
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                } finally {
+                    con.disconnect();
+                }
+
+                /*
                 try {
                     con = (HttpURLConnection) url.openConnection();
                 } catch (IOException e) {
                     Log.i("con error", "URL connection hodil exception");
                     e.printStackTrace();
                 }
+                */
+
+                /*
                 try {
                     con.setRequestMethod("GET");
                 } catch (ProtocolException e) {
                     Log.i("HTTP GET ERROR", "GET volanie hodil exception");
                     e.printStackTrace();
-                }
-
-                InputStream vysledok = null;
+                }*/
                 con.setConnectTimeout(5000);
 
                 try {
-                    vysledok = con.getInputStream();
-                    InputStreamReader streamReader=new InputStreamReader(vysledok);
-                    BufferedReader inputStream = new BufferedReader(streamReader);
-                    Log.i("BufferedReader", inputStream.toString());
-                } catch (IOException e) {
-                    Log.i("con.getInputStream()", "InputStream hodil exception");
-                    e.printStackTrace();
+                    InputStream in = null;
+                    try {
+                        in = new BufferedInputStream(con.getInputStream());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    Log.i("in", in.toString());
+                } finally {
+                    con.disconnect();
                 }
 
-                if(vysledok != null) {
-                    Log.i("OK", vysledok.toString() + "\n" + menoInput.getText().toString());
-                }
+                if (vysledok != null) {
+                    try {
+                        Log.i("OK", vysledok.toString() + "\n" + con.getResponseCode());
+                        if(con.getResponseCode() > 200){
+                            popupMessage("Nespravne meno alebo heslo", "Pozor:");
+                        }
+                        else{
+                            Log.i("Login", "Spravne meno aj heslo");
+                        }
 
-                else{
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } else {
                     Log.i("Error pri URL: ", url.toString());
                 }
 
