@@ -10,11 +10,12 @@
         android:id="@+id/switch_type"
         android:layout_width="198dp"
         android:layout_height="66dp"
-        android:layout_marginTop="56dp"
+        android:layout_marginTop="60dp"
         android:text="Zamestnávateľ"
         android:textSize="20sp"
+        android:thumbTint="@color/teal_700"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.819"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -23,7 +24,7 @@
         android:layout_width="275dp"
         android:layout_height="93dp"
         android:layout_marginTop="204dp"
-        android:hint="Meno Priezvysko"
+        android:hint="Meno Priezvisko"
         android:singleLine="true"
         android:textAlignment="textStart"
         app:layout_constraintEnd_toEndOf="parent"
@@ -44,23 +45,6 @@
         app:layout_constraintTop_toBottomOf="@+id/textInput_meno"
         app:layout_constraintVertical_bias="0.0" />
 
-    <Button
-        android:id="@+id/button_login"
-        android:layout_width="127dp"
-        android:layout_height="81dp"
-        android:layout_marginTop="68dp"
-        android:text="Log in"
-        android:textColor="#FFFFFF"
-        android:textStyle="bold"
-
-        android:onClick="log_in"
-
-        app:iconPadding="10dp"
-        app:iconTint="#000000"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textInput_heslo" />
-
     <TextView
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
@@ -79,11 +63,42 @@
         android:id="@+id/textView4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
+        android:layout_marginBottom="20dp"
         android:text="Meno:"
         app:layout_constraintBottom_toTopOf="@+id/textInput_meno"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.178"
+        app:layout_constraintHorizontal_bias="0.182"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/button_register"
+        android:layout_width="124dp"
+        android:layout_height="51dp"
+        android:layout_marginTop="72dp"
+        android:layout_marginEnd="16dp"
+        android:backgroundTint="@color/teal_200"
+        android:text="REGISTER"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.315"
+        app:layout_constraintStart_toEndOf="@+id/button_login"
+        app:layout_constraintTop_toBottomOf="@+id/textInput_heslo" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/button_login"
+        android:layout_width="127dp"
+        android:layout_height="81dp"
+        android:layout_marginTop="56dp"
+        android:backgroundTint="@color/teal_700"
+
+        android:onClick="log_in"
+        android:text="Log in"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        app:iconPadding="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.239"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textInput_heslo" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
