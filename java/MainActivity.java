@@ -2,53 +2,32 @@ package mtaa.java;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
-
-import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.os.StrictMode;
 import android.view.View;
 
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
-
+import mtaa.java.data.User;
 import mtaa.java.databinding.ActivityMainBinding;
 
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.Button;
 import android.util.Log;
 import android.widget.EditText;
 
 import org.json.JSONObject;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
 public class MainActivity extends AppCompatActivity {
 
-    private AppBarConfiguration appBarConfiguration;
+    //private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
-
 
     public void popupMessage(String nadpis, String sprava){
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setMessage(sprava);
         alertDialogBuilder.setTitle(nadpis);
-        alertDialogBuilder.setNegativeButton("ok", new DialogInterface.OnClickListener(){
+        alertDialogBuilder.setNegativeButton("OK", new DialogInterface.OnClickListener(){
 
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -67,8 +46,9 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-
+        Button registerTlacidlo = (Button)findViewById(R.id.button_register);
         Button loginTlacidlo = (Button) findViewById(R.id.button_login);
+
         loginTlacidlo.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
@@ -77,24 +57,40 @@ public class MainActivity extends AppCompatActivity {
 
                 String meno = menoInput.getText().toString();
                 String heslo = hesloInput.getText().toString();
-                // volanie za pomoci inej classy
 
-                JSONObject vysledok = new JSONObject();
+                JSONObject pouzivatel = Requests.GET_request("/getUser/" + meno + "/" + heslo + "/");
 
-                volania getUserObjekt = new volania();
-                vysledok = getUserObjekt.getUser("http://" + getUserObjekt.IP + "/getUser/" + meno + "/" + heslo + "/");
 
-                if (vysledok == null) {
+                if (pouzivatel == null)
+                {
                     popupMessage("Chyba!", "Nesprávne meno alebo heslo.");
-                } else {
-                    //vysledok.getString("password");
-                    Log.i("vysledok", vysledok.toString());
+                }
+                else
+                {
+                    Log.i("vysledok", pouzivatel.toString());
+
+                    try
+                    {
+                        User u = new User(pouzivatel);
+
+                        Log.i("name", u.getName());
+                        Log.i("pass",u.getPassword());
+                        Log.i("phone",u.getPhone());
+                        Log.i("email",u.getEmail());
+                        Log.i("bday", String.valueOf(u.getBirthday()));
+
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+
+
                 }
 
             }
         });
 
-        Button registerTlacidlo = (Button)findViewById(R.id.button_register);
         registerTlacidlo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -102,6 +98,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        /*
+        userSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) buttonView.setText("Pracovník");
+                else buttonView.setText("Zamestnávateľ");
+            }
+        });
+         */
 
     }
 
