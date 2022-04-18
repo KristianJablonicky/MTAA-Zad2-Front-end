@@ -11,22 +11,36 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MTAAjava"
+
         android:usesCleartextTraffic="true">
-        <activity
-            android:name=".HomeActivity"
-            android:exported="false" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.MTAAjava">
+            android:theme="@style/Theme.MTAAjava.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".RegisterWorkerActivity" />
+
+        <activity
+            android:name=".RegisterWorkerActivity"
+            />
+        <activity
+            android:name=".RegisterActivity" />
+
+        <activity
+            android:name=".RegisterCompanyActivity" />
+
+        <activity
+            android:name=".EditUserActivity" />
+        <activity
+            android:name=".HomeActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>
