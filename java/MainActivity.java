@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
                         User u = new User(pouzivatel);
 
                         Intent i = new Intent(MainActivity.this, HomeActivity.class);
-                        i.putExtra("currentUser",  u);
+                        i.putExtra("currentUser", u);
                         startActivity(i);
 
                         //Log.i("name", u.getName());
@@ -100,16 +100,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this, RegisterActivity.class));
             }
         });
-
-        /*
-        userSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) buttonView.setText("Pracovník");
-                else buttonView.setText("Zamestnávateľ");
-            }
-        });
-         */
 
     }
 
