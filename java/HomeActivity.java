@@ -2,16 +2,16 @@ package mtaa.java;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import mtaa.java.data.User;
 import mtaa.java.databinding.ActivityHomeBinding;
-import mtaa.java.databinding.ActivityMainBinding;
 
 public class HomeActivity extends AppCompatActivity {
     private ActivityHomeBinding binding;
@@ -32,6 +32,8 @@ public class HomeActivity extends AppCompatActivity {
             User u = (User) extras.get("currentUser");
             username.setText(u.getName());
 
+
+
             if (!u.isEmployer())
             {
                 extrabuttons.setVisibility(View.INVISIBLE);
@@ -39,10 +41,18 @@ public class HomeActivity extends AppCompatActivity {
                 //extrabuttons.setLayoutParams();
             }
 
+            ImageButton nastaveniaTlacidlo = (ImageButton) findViewById(R.id.Bsettings);
+            nastaveniaTlacidlo.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent i = new Intent(HomeActivity.this, EditUserActivity.class);
+                    i.putExtra("currentUser", u);
+                    startActivity(i);
+                }
+            });
+
         }
         else Log.e("ERROR","Screen 'Homepage' could not be initialized.");
-
-
 
     }
 }
