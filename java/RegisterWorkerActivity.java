@@ -33,34 +33,34 @@ public class RegisterWorkerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register_worker);
 
-        Button registerTlacidlo = (Button)findViewById(R.id.button_createWorker);
+        Button registerTlacidlo = (Button)findViewById(R.id.button_createCompany);
         registerTlacidlo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String urlString = "/postWorker/W/";
+                String urlString = "/postUser/W/";
 
-                EditText menoInput = (EditText) findViewById(R.id.textInput_menoWorker);
+                EditText menoInput = (EditText) findViewById(R.id.textInput_menoRegistracia);
                 String meno = menoInput.getText().toString();
                 if(meno.length() < 1){
                     popupMessage("Chyba!", "Údaj Meno musí byť vlpnený");
                 }
                 else{
-                    urlString += "name=" + meno + "/";
+                    urlString += meno + "/";
                 }
 
-                EditText hesloInput = (EditText) findViewById(R.id.textInput_hesloWorker);
+                EditText hesloInput = (EditText) findViewById(R.id.textInput_hesloRegistracia);
                 String heslo = hesloInput.getText().toString();
                 if(heslo.length() < 1){
                     popupMessage("Chyba!", "Údaj Meno musí byť vlpnený");
                 }
                 else{
-                    urlString += "password=" + heslo + "/";
+                    urlString += heslo + "/";
                 }
 
                 Requests objekt = new Requests();
-                objekt.postWorker(urlString);
+                String[] response = objekt.OTHER_request("POST", urlString);
 
-                Log.i("ok",meno);
+                Log.i("response", String.valueOf(response));
 
             }
         });
