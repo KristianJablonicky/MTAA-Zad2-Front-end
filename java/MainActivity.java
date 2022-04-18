@@ -18,26 +18,25 @@ import android.widget.EditText;
 
 import org.json.JSONObject;
 
-public class MainActivity extends AppCompatActivity {
+import java.io.Serializable;
 
-    //private AppBarConfiguration appBarConfiguration;
+public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
 
     public void popupMessage(String nadpis, String sprava){
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setMessage(sprava);
         alertDialogBuilder.setTitle(nadpis);
-        alertDialogBuilder.setNegativeButton("OK", new DialogInterface.OnClickListener(){
-
+        alertDialogBuilder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                Log.d(nadpis,"Ok button stlaceny");
+                //Log.d(nadpis,"Ok button stlaceny");
             }
         });
+
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
     }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,11 +72,15 @@ public class MainActivity extends AppCompatActivity {
                     {
                         User u = new User(pouzivatel);
 
-                        Log.i("name", u.getName());
-                        Log.i("pass",u.getPassword());
-                        Log.i("phone",u.getPhone());
-                        Log.i("email",u.getEmail());
-                        Log.i("bday", String.valueOf(u.getBirthday()));
+                        Intent i = new Intent(MainActivity.this, HomeActivity.class);
+                        i.putExtra("currentUser",  u);
+                        startActivity(i);
+
+                        //Log.i("name", u.getName());
+                        //Log.i("pass",u.getPassword());
+                        //Log.i("phone",u.getPhone());
+                        //Log.i("email",u.getEmail());
+                        //Log.i("bday", String.valueOf(u.getBirthday()));
 
                     }
                     catch (Exception e)

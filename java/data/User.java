@@ -1,10 +1,13 @@
 package mtaa.java.data;
 
 import org.json.JSONObject;
+
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class User {
+public class User implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String name;
     private String password;
     private String phone;
