@@ -38,6 +38,8 @@
         <activity
             android:name=".EditUserActivity" />
         <activity
+            android:name=".ViewUserActivity" />
+        <activity
             android:name=".HomeActivity"
             android:exported="false" />
 
