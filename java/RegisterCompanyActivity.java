@@ -39,7 +39,6 @@ public class RegisterCompanyActivity extends AppCompatActivity {
         registerTlacidlo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("ok","lol");
 
                 String urlString = "/postCompany/";
 
