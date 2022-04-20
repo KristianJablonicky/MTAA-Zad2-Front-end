@@ -8,6 +8,8 @@ import java.util.Date;
 
 public class User implements Serializable {
     private static final long serialVersionUID = 1L;
+
+    private Integer id;
     private String name;
     private String password;
     private String phone;
@@ -20,11 +22,11 @@ public class User implements Serializable {
     //Constructors
     public User() {}
 
-    //@SuppressLint("NewApi")
     public User(JSONObject user) throws Exception
     {
         SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd");
 
+        this.id = (Integer) user.get("id");
         this.name = (String) user.get("name");
         this.password =  (String) user.get("password");
 
@@ -39,12 +41,20 @@ public class User implements Serializable {
 
         try
         {
-            this.companyID = (int)user.get("company_id");
+            this.companyID = (Integer) user.get("company_id");
         }
         catch (Exception e)
         {
             this.companyID = null;
         }
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getName() {

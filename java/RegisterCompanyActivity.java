@@ -87,10 +87,10 @@ public class RegisterCompanyActivity extends AppCompatActivity {
                 //inputy nacitane, ide sa poslat request
 
                 Requests objekt = new Requests();
-                String[] response = objekt.OTHER_request("POST", urlString);
+                String response = objekt.OTHER_request("POST", urlString);
 
                 Log.i("response", String.valueOf(response));
-                int responseCode = Integer.parseInt(response[0]);
+                int responseCode = Integer.parseInt(response);
                 if (responseCode >= 400){
                     popupMessage("Chyba!", "Spoločnosť s menom " + meno + " je už zaevidovaná v databáze," +
                             "\nalebo ste zadali nesprávne údaje");

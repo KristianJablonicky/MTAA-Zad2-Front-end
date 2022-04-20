@@ -58,7 +58,7 @@ public class RegisterWorkerActivity extends AppCompatActivity {
                 }
 
                 Requests objekt = new Requests();
-                String[] response = objekt.OTHER_request("POST", urlString);
+                String response = objekt.OTHER_request("POST", urlString);
 
                 Log.i("response", String.valueOf(response));
 

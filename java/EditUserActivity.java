@@ -126,16 +126,16 @@ public class EditUserActivity extends AppCompatActivity {
 
                     Requests objekt = new Requests();
 
-                    String[] response = objekt.OTHER_request("PUT", urlString);
+                    String response = objekt.OTHER_request("PUT", urlString);
 
-                    int responseCode = Integer.parseInt(response[0]);
+                    int responseCode = Integer.parseInt(response);
 
                     if (responseCode >= 400) {
                         //popupMessage("Chyba!", "Pri aktualizovaní údajov došlo ku chybe");
-                        popupMessage("Chyba", response[1]);
+                        popupMessage("Chyba", "HTTP error kod: " + response);
                     } else {
                         //popupMessage("Úspech", "Vaše údaje boli pspešne nahrané do databázy.");
-                        popupMessage("Úspech", response[1]);
+                        popupMessage("Úspech", "HTTP kod: " + response);
                     }
                     //--aktualizacia objektu User
 
@@ -180,11 +180,11 @@ public class EditUserActivity extends AppCompatActivity {
                     if(u.getCompanyID() == -1)
                         type = "W";
 
-                    String[] vysledok = objekt.OTHER_request("DELETE","/delUser/" + type + "/" + u.getName() + "/" + u.getPassword() + "/");
-                    int responseCode = Integer.parseInt(vysledok[0]);
+                    String vysledok = objekt.OTHER_request("DELETE","/delUser/" + type + "/" + u.getName() + "/" + u.getPassword() + "/");
+                    int responseCode = Integer.parseInt(vysledok);
                     if(responseCode >= 400){
                         //popupMessage("Chyba!", "Pri odstraňovaní používateľa z databázy došlo ku chybe");
-                        popupMessage("Chyba!", vysledok[1]);
+                        popupMessage("Chyba!", "HTTP erroe kod: " + vysledok);
                     }
                     else{
                         startActivity(new Intent(EditUserActivity.this, MainActivity.class));
