@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:backgroundTint="#000000"
+    tools:context=".JobOfferActivity">
+
+    <TextView
+        android:id="@+id/TFoffer5"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginBottom="4dp"
+        android:text="Poloha:"
+        android:textColor="#000000"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/TFofferlocation"
+        app:layout_constraintEnd_toEndOf="@+id/TFofferlocation"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/TFofferlocation" />
+
+    <EditText
+        android:id="@+id/TFofferlocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:ems="10"
+        android:hint="Poloha práce"
+        android:inputType="textPersonName"
+        android:minHeight="48dp"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@+id/TFofferdetail"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.151"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/TFofferhours"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/TFoffer6"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginBottom="4dp"
+        android:text="Detail:"
+        android:textColor="#000000"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/TFofferdetail"
+        app:layout_constraintEnd_toEndOf="@+id/TFofferdetail"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/TFofferdetail" />
+
+    <EditText
+        android:id="@+id/TFofferhours"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:ems="10"
+        android:hint="Pracovný čas HH:MM"
+        android:inputType="textPersonName"
+        android:minHeight="48dp"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.147"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/TFoffersalary" />
+
+    <TextView
+        android:id="@+id/TFoffer4"
+        android:layout_width="wrap_content"
+        android:layout_height="19dp"
+        android:layout_marginBottom="4dp"
+        android:text="Pracovný čas:"
+        android:textColor="#000000"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/TFofferhours"
+        app:layout_constraintEnd_toEndOf="@+id/TFofferhours"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/TFofferhours" />
+
+    <TextView
+        android:id="@+id/TFoffer3"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginBottom="4dp"
+        android:text="Plat:"
+        android:textColor="#000000"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/TFoffersalary"
+        app:layout_constraintEnd_toEndOf="@+id/TFoffersalary"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/TFoffersalary" />
+
+    <EditText
+        android:id="@+id/TFoffersalary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="36dp"
+        android:ems="10"
+        android:hint="Plat v eurách"
+        android:inputType="textPersonName"
+        android:minHeight="48dp"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.147"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/TFofferfield" />
+
+    <EditText
+        android:id="@+id/TFoffername"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="44dp"
+        android:ems="10"
+        android:hint="Názov práce"
+        android:inputType="textPersonName"
+        android:minHeight="48dp"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.147"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/TFnadpis" />
+
+    <TextView
+        android:id="@+id/TFoffer1"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginBottom="4dp"
+        android:text="Názov:"
+        android:textColor="#000000"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/TFoffername"
+        app:layout_constraintEnd_toEndOf="@+id/TFoffername"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/TFoffername" />
+
+    <TextView
+        android:id="@+id/TFnadpis"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="Pracovná ponuka"
+        android:textColor="#000000"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/Boffernaspat"
+        android:layout_width="77dp"
+        android:layout_height="43dp"
+        android:text="Späť"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.91"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.042"
+        tools:ignore="TouchTargetSizeCheck" />
+
+    <Button
+        android:id="@+id/Bofferuloz"
+        android:layout_width="97dp"
+        android:layout_height="70dp"
+        android:backgroundTint="@color/light_red"
+        android:text="Ulož zmeny"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.904"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.553" />
+
+    <EditText
+        android:id="@+id/TFofferfield"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:ems="10"
+        android:hint="Pracovná oblasť práce"
+        android:inputType="textPersonName"
+        android:minHeight="48dp"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.147"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/TFoffername" />
+
+    <TextView
+        android:id="@+id/TFoffer2"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginBottom="4dp"
+        android:text="Oblasť:"
+        android:textColor="#000000"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/TFofferfield"
+        app:layout_constraintEnd_toEndOf="@+id/TFofferfield"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/TFofferfield" />
+
+    <EditText
+        android:id="@+id/TFofferdetail"
+        android:layout_width="347dp"
+        android:layout_height="139dp"
+        android:layout_marginBottom="16dp"
+        android:background="@color/light_grey"
+        android:gravity="top"
+        android:hint="Detailný popis práce"
+        android:inputType="text|textMultiLine"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+    <Button
+        android:id="@+id/Bofferdelete"
+        android:layout_width="131dp"
+        android:layout_height="89dp"
+        android:backgroundTint="@color/dark_red"
+        android:text="Odstráň pracovnú ponuku"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.942"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.314" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

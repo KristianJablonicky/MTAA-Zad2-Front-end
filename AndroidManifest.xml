@@ -11,9 +11,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MTAAjava"
-
         android:usesCleartextTraffic="true">
-
+        <activity
+            android:name=".activity_application"
+            android:exported="false" />
+        <activity
+            android:name=".JobOfferActivity"
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -25,24 +29,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity
-            android:name=".RegisterWorkerActivity"
-            />
-        <activity
-            android:name=".RegisterActivity" />
-
-        <activity
-            android:name=".RegisterCompanyActivity" />
-
-        <activity
-            android:name=".EditUserActivity" />
-        <activity
-            android:name=".ViewUserActivity" />
+        <activity android:name=".RegisterWorkerActivity" />
+        <activity android:name=".RegisterActivity" />
+        <activity android:name=".RegisterCompanyActivity" />
+        <activity android:name=".EditUserActivity" />
         <activity
             android:name=".HomeActivity"
             android:exported="false" />
-
     </application>
 
 </manifest>
