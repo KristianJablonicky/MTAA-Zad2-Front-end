@@ -31,6 +31,7 @@
         <activity android:name=".RegisterWorkerActivity" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".RegisterCompanyActivity" />
+        <activity android:name=".ViewUserActivity" />
         <activity android:name=".EditUserActivity" />
         <activity
             android:name=".HomeActivity"
