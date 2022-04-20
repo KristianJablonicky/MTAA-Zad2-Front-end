@@ -5,6 +5,31 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <EditText
+        android:id="@+id/textInput_pdf_meno"
+        android:layout_width="160dp"
+        android:layout_height="42dp"
+        android:ems="10"
+        android:hint="zivotopis"
+        android:inputType="textPersonName"
+        android:singleLine="true"
+        android:textSize="10sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.976"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView16" />
+
+    <TextView
+        android:id="@+id/textView16"
+        android:layout_width="163dp"
+        android:layout_height="17dp"
+        android:layout_marginTop="20dp"
+        android:text="Názov súboru PDF"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.987"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button_PDF" />
+
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/button_edit_back"
         android:layout_width="87dp"
@@ -38,7 +63,7 @@
         android:layout_width="127dp"
         android:layout_height="81dp"
 
-        android:layout_marginBottom="396dp"
+        android:layout_marginBottom="500dp"
         android:backgroundTint="@color/orange"
         android:onClick="log_in"
         android:text="Pridaj životopis"
