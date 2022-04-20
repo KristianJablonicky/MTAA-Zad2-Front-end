@@ -91,7 +91,13 @@ public class ViewUserActivity extends AppCompatActivity {
                 public void onClick(View v) {
                     if(uview.getCompanyID() == -1) {
                         popupMessage("INFO", "Používateľ nemá zadaný životopis");
+                        return;
                     }
+
+                    Requests request = new Requests();
+                    request.PDF_GET_request(uview.getId().toString());
+
+
                 }
             });
 
