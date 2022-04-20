@@ -204,6 +204,12 @@ public class EditUserActivity extends AppCompatActivity {
                         return;
                     }
 
+
+                    Requests objekt = new Requests();
+                    int responseCode = objekt.PDF_request("POST", "/postPDF/"+ u.getName() + "/" + u.getPassword() + "/");
+                    Log.i("Response code", String.valueOf(responseCode));
+                    date.setText(String.valueOf(responseCode));
+
                     //https://stackoverflow.com/questions/9095610/android-fileinputstream-read-txt-file-to-string
 
                     //https://stackoverflow.com/questions/1678435/from-pdf-to-string
@@ -291,8 +297,6 @@ public class EditUserActivity extends AppCompatActivity {
 
                     //req.POST_PDF()
 
-
-                    Log.i("Path zariadenia", Environment.getExternalStorageDirectory().getAbsolutePath());
 
                     //https://stackoverflow.com/questions/56944512/how-to-send-pdf-file-to-server-in-android-studio
                     //https://www.baeldung.com/sprint-boot-multipart-requests
