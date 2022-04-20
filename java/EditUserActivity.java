@@ -4,7 +4,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -56,6 +55,7 @@ public class EditUserActivity extends AppCompatActivity {
             TextView email = (TextView) findViewById(R.id.textInput_emailEdit);
             TextView phone = (TextView) findViewById(R.id.textInput_phoneEdit);
             TextView date = (TextView) findViewById(R.id.textInput_dateEdit);
+            TextView pdfMeno = (TextView) findViewById(R.id.textInput_pdf_meno);
 
             User u = (User) extras.get("currentUser");
 
@@ -184,7 +184,7 @@ public class EditUserActivity extends AppCompatActivity {
                     int responseCode = Integer.parseInt(vysledok);
                     if(responseCode >= 400){
                         //popupMessage("Chyba!", "Pri odstraňovaní používateľa z databázy došlo ku chybe");
-                        popupMessage("Chyba!", "HTTP error kod: " + vysledok);
+                        popupMessage("Chyba!", "HTTP erroe kod: " + vysledok);
                     }
                     else{
                         startActivity(new Intent(EditUserActivity.this, MainActivity.class));
@@ -206,108 +206,15 @@ public class EditUserActivity extends AppCompatActivity {
 
 
                     Requests objekt = new Requests();
-                    int responseCode = objekt.PDF_request("POST", "/postPDF/"+ u.getName() + "/" + u.getPassword() + "/");
-                    Log.i("Response code", String.valueOf(responseCode));
-                    date.setText(String.valueOf(responseCode));
-
-                    //https://stackoverflow.com/questions/9095610/android-fileinputstream-read-txt-file-to-string
-
-                    //https://stackoverflow.com/questions/1678435/from-pdf-to-string
-                    //https://www.snowtide.com/
-
-
-
-                    /*
-                    try {
-                        FileOutputStream fOut = openFileOutput ( "cv.pdf" , Context.MODE_PRIVATE ) ;
-                        Log.i("try", "try");
-                        OutputStreamWriter osw = new OutputStreamWriter ( fOut ) ;
-                        osw.write ( "ok" ) ;
-                        osw.flush ( ) ;
-                        osw.close ( ) ;
-
-                        Log.i("???", osw.toString());
-
-                    } catch ( Exception e ) {
-                        Log.i("Error", e.toString());
-                        e.printStackTrace ( ) ;
+                    if(pdfMeno.getText().toString().length() > 0) {
+                        String pdfMenoString = pdfMeno.getText().toString();
+                        int responseCode = objekt.PDF_POST_request(pdfMenoString, "/postPDF/" + u.getName() + "/" + u.getPassword() + "/");
+                        Log.i("Response code", String.valueOf(responseCode));
                     }
-                    */
-                    /*
-                    StringBuffer datax = new StringBuffer("");
-                    try {
-                        FileInputStream fIn = openFileInput ( "zivotopis.pdf" ) ;
-                        InputStreamReader isr = new InputStreamReader ( fIn ) ;
-                        BufferedReader buffreader = new BufferedReader ( isr ) ;
-
-                        String readString = buffreader.readLine ( ) ;
-                        while ( readString != null ) {
-                            datax.append(readString);
-                            readString = buffreader.readLine ( ) ;
-                        }
-
-                        isr.close ( ) ;
-                    } catch ( IOException ioe ) {
-                        ioe.printStackTrace ( ) ;
+                    else {
+                        popupMessage("Chyba", "Zadajte názov súboru PDF\n" +
+                                "(nezadávajte koncovku .pdf)");
                     }
-                    Log.i("Vysledok", datax.toString());
-                    */
-
-
-                    //https://developer.android.com/training/data-storage/shared/documents-files#java
-
-                    /*
-                    Requests req = new Requests();
-
-                    Uri pickerInitialUri = Uri.parse("/sdcard/");
-                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-                    intent.addCategory(Intent.CATEGORY_OPENABLE);
-                    intent.setType("application/pdf");
-
-                    intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri);
-
-
-                    startActivityForResult(intent, 2);
-
-
-
-                    //Log.i("vola sa", "funkcia");
-                    //onActivityResult(intent);
-                    int resultCode = 0;
-                    */
-                    /*
-
-                    onActivityResult (2, resultCode, intent);
-
-
-                    Log.i("ide if", "oof");
-                    if (resultCode == Activity.RESULT_OK) {
-                        Log.i("funkcia:", "if 1");
-                        Uri uri = null;
-                        if (intent != null) {
-                            Log.i("funkcia:", "if 2");
-                            uri = intent.getData();
-                            Log.i("resultData", intent.toString());
-                            // Perform operations on the document using its URI.
-                        }
-                    }
-                    */
-
-
-
-                    //req.POST_PDF()
-
-
-                    //https://stackoverflow.com/questions/56944512/how-to-send-pdf-file-to-server-in-android-studio
-                    //https://www.baeldung.com/sprint-boot-multipart-requests
-                    //https://stackoverflow.com/questions/4126625/how-do-i-send-a-file-in-android-from-a-mobile-device-to-server-using-http?answertab=scoredesc#tab-top
-                    //https://www.c-sharpcorner.com/article/upload-files-to-server-using-retrofit-2-in-android/
-
-                    //BACKEDND
-                    //https://blog.crunchydata.com/blog/using-postgresqls-bytea-type-with-django
-
-                    //File myFile = new File("/path/to/file.png");
-
 
                 }
             });
