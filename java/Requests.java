@@ -1,6 +1,5 @@
 package mtaa.java;
 
-import android.content.DialogInterface;
 import android.os.Build;
 import android.os.StrictMode;
 import android.util.Log;
@@ -11,7 +10,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -20,17 +18,23 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.PosixFilePermissions;
 
 class Requests {
-    static private String IP = "10.10.37.255";   //MATUS-IP
-    //static private String IP = "192.168.219.127"; //KRISTIAN-IP
+    //static private String IP = "10.10.37.255";   //MATUS-IP
+    static private String IP = "192.168.219.127"; //KRISTIAN-IP
     static private String PORT = ":8000";
+
+    //static private String filePath = "sdcard/Download/"; // emulator
+    static private String filePath = "storage/emulated/0/Download/"; // android zariadenie
+
 
     //https://stackoverflow.com/questions/4308554/simplest-way-to-read-json-from-a-url-in-java
     private static String readAll(InputStream s) throws IOException {
@@ -201,33 +205,24 @@ class Requests {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public int PDF_request(String type, String urlBody) throws SecurityException{
+    public int PDF_POST_request(String pdfMeno, String urlBody) throws SecurityException{
+
 
         //https://stackoverflow.com/questions/2469451/upload-files-from-java-client-to-a-http-server
         String boundary = Long.toHexString(System.currentTimeMillis());
         String charset = "UTF-8";
         String CRLF = "\r\n";
 
-        //Path path = FileSystems.getDefault().getPath("sdcard/Download", "zivotopis.pdf");
-        //"/sdcard/Download/zivotopis.pdf"
+        Path path = Paths.get(filePath + pdfMeno + ".pdf");
 
-
-        Path path = Paths.get("/sdcard/Download/zivotopis.pdf");
-        //Path path = Paths.get("/storage/emulated/0/Download/cv-1.pdf");
-        File binaryFile = new File(String.valueOf(path));
-
-        binaryFile.setReadable(true, false);
-
-        boolean exists = binaryFile.exists();
-        if (exists == true) {
-
-            // Printing the permissions associated
-            // with the file
-            Log.i("Executable: ", String.valueOf(binaryFile.canExecute()));
+        File binaryFile = null;
+        try {
+            Files.setPosixFilePermissions(path, PosixFilePermissions.fromString("rw-rw-rw-"));
+            binaryFile = new File(String.valueOf(path));
             Log.i("Readable: ", String.valueOf(binaryFile.canRead()));
-            Log.i("Writable: ", String.valueOf(binaryFile.canWrite()));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
 
         URLConnection connection = null;
         try {
@@ -268,5 +263,27 @@ class Requests {
         }
 
 
+
+    }
+    public void PDF_GET_request(String urlBody){
+        /*
+        URL url = null;
+        try {
+            url = new URL("http://"+ IP + PORT + "/getPDF/" + urlBodyurlBody + "/");
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        //https://stackoverflow.com/questions/68507130/download-pdf-files-from-url-and-save-it-in-a-particular-folder-in-android-java
+
+        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url + ""));
+        request.setTitle("fileName");
+        request.setMimeType("application/pdf");
+        request.allowScanningByMediaScanner();
+        request.setAllowedOverMetered(true);
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "AldoFiles/" + "fileName");
+        DownloadManager downloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+        downloadManager.enqueue(request);
+        */
     }
 }
