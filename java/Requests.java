@@ -11,6 +11,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -27,8 +28,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 class Requests {
-    //static private String IP = "10.10.37.255";   //MATUS-IP
-    static private String IP = "192.168.219.127"; //KRISTIAN-IP
+    static private String IP = "10.10.37.255";   //MATUS-IP
+    //static private String IP = "192.168.219.127"; //KRISTIAN-IP
     static private String PORT = ":8000";
 
     //https://stackoverflow.com/questions/4308554/simplest-way-to-read-json-from-a-url-in-java
@@ -209,6 +210,7 @@ class Requests {
 
         //Path path = FileSystems.getDefault().getPath("sdcard/Download", "zivotopis.pdf");
         //"/sdcard/Download/zivotopis.pdf"
+
 
         Path path = Paths.get("/sdcard/Download/zivotopis.pdf");
         //Path path = Paths.get("/storage/emulated/0/Download/cv-1.pdf");

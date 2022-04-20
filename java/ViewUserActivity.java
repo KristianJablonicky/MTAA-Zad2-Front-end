@@ -46,10 +46,7 @@ public class ViewUserActivity extends AppCompatActivity {
             setContentView(R.layout.activity_view_profile);
 
             User u = (User) extras.get("currentUser");
-
-
-            JSONObject pouzivatel = Requests.GET_request("/get" + extras.get("type") + "/" + extras.get("id") + "/");
-            Log.i("URL", "/get" + extras.get("type") + "/" + extras.get("id") + "/");
+            User uview = (User) extras.get("shownuser");
 
             TextView meno = (TextView) findViewById(R.id.text_view_meno);
             TextView email = (TextView) findViewById(R.id.text_view_email);
@@ -57,9 +54,9 @@ public class ViewUserActivity extends AppCompatActivity {
             TextView phone = (TextView) findViewById(R.id.text_view_phone);
             TextView company = (TextView) findViewById(R.id.text_view_company);
 
-            if(pouzivatel != null) {
+            if(u != null && uview != null) {
                 try {
-                    User viewCiel = new User(pouzivatel);
+                    User viewCiel = uview;
 
                     meno.setText(viewCiel.getName());
                     if(viewCiel.getEmail() != null)
@@ -92,7 +89,7 @@ public class ViewUserActivity extends AppCompatActivity {
             pdfTlacidlo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(u.getCompanyID() == -1) {
+                    if(uview.getCompanyID() == -1) {
                         popupMessage("INFO", "Používateľ nemá zadaný životopis");
                     }
                 }

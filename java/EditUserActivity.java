@@ -184,7 +184,7 @@ public class EditUserActivity extends AppCompatActivity {
                     int responseCode = Integer.parseInt(vysledok);
                     if(responseCode >= 400){
                         //popupMessage("Chyba!", "Pri odstraňovaní používateľa z databázy došlo ku chybe");
-                        popupMessage("Chyba!", "HTTP erroe kod: " + vysledok);
+                        popupMessage("Chyba!", "HTTP error kod: " + vysledok);
                     }
                     else{
                         startActivity(new Intent(EditUserActivity.this, MainActivity.class));

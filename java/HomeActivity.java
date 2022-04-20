@@ -262,9 +262,11 @@ public class HomeActivity extends AppCompatActivity {
                     {
                         User item = (User) list.getItemAtPosition( position );
 
+                        Intent i = new Intent(HomeActivity.this, ViewUserActivity.class);
+                        i.putExtra("currentUser", u);
+                        i.putExtra("shownuser",item);
 
-
-                        System.out.println(item.toString());
+                        startActivity(i);
                     }
                     else
                     {
