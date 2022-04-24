@@ -28,8 +28,8 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermissions;
 
 class Requests {
-    //static private String IP = "10.10.37.255";   //MATUS-IP
-    static private String IP = "192.168.219.127"; //KRISTIAN-IP
+    static private String IP = "192.168.1.4";   //MATUS-IP
+    //static private String IP = "192.168.219.127"; //KRISTIAN-IP
     static private String PORT = ":8000";
 
     //static private String filePath = "sdcard/Download/"; // emulator

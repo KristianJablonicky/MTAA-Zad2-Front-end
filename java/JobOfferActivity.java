@@ -109,7 +109,10 @@ public class JobOfferActivity extends AppCompatActivity {
             {
                 name.setText(j.getName());
                 field.setText(j.getField());
-                salary.setText(j.getSalary());
+
+                if (j.getSalary() == -1) salary.setText("");
+                else salary.setText(j.getSalary().toString());
+
                 hours.setText(j.getWorking_hours());
                 location.setText(j.getLocation());
                 detail.setText(j.getDetail());
@@ -137,7 +140,7 @@ public class JobOfferActivity extends AppCompatActivity {
                         else
                         {
                             method = "PUT";
-                            URLstring = "/putJobOffer/"+ u.getName() + "/" + u.getPassword() + "/" + j.getId();
+                            URLstring = "/putJobOffer/"+ u.getName() + "/" + u.getPassword() + "/" + j.getId() + "/";
                             URLstring += "name=" + name.getText().toString() + "/field=" + field.getText().toString() + "/";
 
                         }

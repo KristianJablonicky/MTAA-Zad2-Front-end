@@ -275,7 +275,7 @@ public class HomeActivity extends AppCompatActivity {
                         i.putExtra("currentUser", u);
                         i.putExtra("currentJob",item);
 
-                        if (u.isEmployer() && item.getEmployerID() == u.getId())  i.putExtra("edit",2);
+                        if (u.isEmployer() && item.getEmployerID().equals(u.getId())) i.putExtra("edit",2);
                         else i.putExtra("edit",0);
 
                         startActivity(i);
