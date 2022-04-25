@@ -1,35 +1,43 @@
 package mtaa.java;
 
+
+import android.graphics.pdf.PdfDocument;
 import android.os.Build;
+import android.os.Environment;
 import android.os.StrictMode;
 import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 
+import com.google.firebase.crashlytics.buildtools.reloc.org.apache.commons.io.FileUtils;
+
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.PosixFilePermissions;
+import java.util.Base64;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 class Requests {
-    static private String IP = "192.168.1.4";   //MATUS-IP
-    //static private String IP = "192.168.219.127"; //KRISTIAN-IP
+
+    //static private String IP = "10.10.37.255";   //MATUS-IP
+    static private String IP = "192.168.219.127"; //KRISTIAN-IP
     static private String PORT = ":8000";
 
     //static private String filePath = "sdcard/Download/"; // emulator
@@ -47,7 +55,6 @@ class Requests {
         rd.close();
         return sb.toString();
     }
-
 
     public static JSONObject GET_request(String urlBody)
     {
@@ -205,85 +212,100 @@ class Requests {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public int PDF_POST_request(String pdfMeno, String urlBody) throws SecurityException{
+    public int PDF_POST_request(String pdfMeno, String url) throws SecurityException{
 
 
         //https://stackoverflow.com/questions/2469451/upload-files-from-java-client-to-a-http-server
-        String boundary = Long.toHexString(System.currentTimeMillis());
-        String charset = "UTF-8";
-        String CRLF = "\r\n";
 
-        Path path = Paths.get(filePath + pdfMeno + ".pdf");
-
-        File binaryFile = null;
-        try {
-            Files.setPosixFilePermissions(path, PosixFilePermissions.fromString("rw-rw-rw-"));
-            binaryFile = new File(String.valueOf(path));
-            Log.i("Readable: ", String.valueOf(binaryFile.canRead()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        URLConnection connection = null;
-        try {
-            connection = new URL("http://" + IP + PORT + urlBody).openConnection();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        connection.setDoOutput(true);
-        connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
-
-        try (
-                OutputStream output = connection.getOutputStream();
-                PrintWriter writer = new PrintWriter(new OutputStreamWriter(output, charset), true);
-        ) {writer.append("--" + boundary).append(CRLF);
-            writer.append("Content-Disposition: form-data; name=\"binaryFile\"; filename=\"" + binaryFile.getName() + "\"").append(CRLF);
-            writer.append("Content-Type: " + URLConnection.guessContentTypeFromName(binaryFile.getName())).append(CRLF);
-            writer.append("Content-Transfer-Encoding: binary").append(CRLF);
-            writer.append(CRLF).flush();
-            Files.copy(binaryFile.toPath(), output);
-
-            output.flush(); // Important before continuing with writer!
-            writer.append(CRLF).flush(); // CRLF is important! It indicates end of boundary.
-
-            // End of multipart/form-data.
-            writer.append("--" + boundary + "--").append(CRLF).flush();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        File binaryFile = new File(pdfMeno.split(":")[1]);
 
         try {
-            int responseCode = ((HttpURLConnection) connection).getResponseCode();
-            return responseCode;
+            Path cesta =  Paths.get(pdfMeno.split(":")[1]);
+            binaryFile.setReadable(true);
+
+            byte[] fileContent = FileUtils.readFileToByteArray(new File(String.valueOf(cesta)));
+            String encodedString = Base64.getEncoder().encodeToString(fileContent);
+
+            createPostRequest(encodedString, "http://" + IP + PORT + url);
+            return 200;
+
         } catch (IOException e) {
             e.printStackTrace();
-            return 400;
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
 
-
+        return 500;
 
     }
-    public void PDF_GET_request(String urlBody){
-        /*
-        URL url = null;
+    public boolean PDF_GET_request(String url, String meno) {
+
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder().url("http://" + IP + PORT + url).build();
+        Response response = null;
+
+        //https://www.geeksforgeeks.org/how-to-generate-a-pdf-file-in-android-app/
+        //cast kodu je prekopirovana aj do MainActivity
+
+
+
         try {
-            url = new URL("http://"+ IP + PORT + "/getPDF/" + urlBodyurlBody + "/");
-        } catch (MalformedURLException e) {
+            response = client.newCall(request).execute();
+
+            if (response.body().contentLength() != -1) // pouzivatel nema zverejneny zivotopis
+                return false;
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+                PdfDocument pdfDocument = new PdfDocument();
+                File file = new File(Environment.getExternalStorageDirectory(), "Životopis " + meno + ".pdf");
+                file.setWritable(true);
+                FileOutputStream fos = new FileOutputStream(file);
+                pdfDocument.writeTo(new FileOutputStream(file));
+
+                fos.write(Base64.getDecoder().decode(response.body().bytes()));
+                fos.close();
+                pdfDocument.close();
+
+                response.close();
+                return true;
+            }
+            else{
+                Log.i("Android Verzia", "Verzia Androidu nepodporuje tuto funkciu.");
+                response.close();
+                return false;
+            }
+
+        } catch (IOException e) {
             e.printStackTrace();
         }
-        //https://stackoverflow.com/questions/68507130/download-pdf-files-from-url-and-save-it-in-a-particular-folder-in-android-java
+        if (!response.isSuccessful()) {
+            try {
+                throw new IOException("Failed to download file: " + response);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        response.close();
+        return false;
+    }
+    private void createPostRequest(String byteArray, String url) throws IOException, JSONException {
+        JSONObject jsonData = new JSONObject();
+        jsonData.put("PDFbytes", byteArray);
 
-        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url + ""));
-        request.setTitle("fileName");
-        request.setMimeType("application/pdf");
-        request.allowScanningByMediaScanner();
-        request.setAllowedOverMetered(true);
-        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "AldoFiles/" + "fileName");
-        DownloadManager downloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
-        downloadManager.enqueue(request);
-        */
+        final MediaType CONTENT_TYPE = MediaType.parse("application/json");
+
+        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+        builder.connectTimeout(20, TimeUnit.SECONDS);
+        builder.readTimeout(20, TimeUnit.SECONDS);
+        builder.writeTimeout(20, TimeUnit.SECONDS);
+
+        OkHttpClient client = builder.build();
+        final Request request = new Request.Builder()
+                .url(url)
+                .post(RequestBody.create(jsonData.toString(), CONTENT_TYPE))
+                .build();
+
+        client.newCall(request).execute();
     }
 }
