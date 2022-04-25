@@ -12,7 +12,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.text.Format;
 import java.text.SimpleDateFormat;
@@ -86,16 +85,20 @@ public class ViewUserActivity extends AppCompatActivity {
             }
 
             Button pdfTlacidlo = (Button) findViewById(R.id.button_view_PDF);
+            if(uview.getCompanyID() != -1) {
+                pdfTlacidlo.setVisibility(View.INVISIBLE);
+                pdfTlacidlo.setVisibility(View.GONE);
+            }
             pdfTlacidlo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(uview.getCompanyID() == -1) {
-                        popupMessage("INFO", "Používateľ nemá zadaný životopis");
-                        return;
-                    }
 
                     Requests request = new Requests();
-                    request.PDF_GET_request(uview.getId().toString());
+                    if(request.PDF_GET_request("/getPDF/" + uview.getId().toString() + "/", uview.getName()))
+                        popupMessage("Úspech", "Životopis bol úspešne stiahnutý.");
+                    else
+                        popupMessage("Chyba", "Používateľ nemá zverejnený životopis," +
+                                "\nalebo nastala chyba pri sťahovaní súboru.");
 
 
                 }
