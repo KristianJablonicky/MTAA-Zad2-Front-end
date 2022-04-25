@@ -1,7 +1,10 @@
 package mtaa.java;
 
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,10 +13,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import org.json.JSONObject;
 import java.text.Format;
@@ -55,7 +63,6 @@ public class EditUserActivity extends AppCompatActivity {
             TextView email = (TextView) findViewById(R.id.textInput_emailEdit);
             TextView phone = (TextView) findViewById(R.id.textInput_phoneEdit);
             TextView date = (TextView) findViewById(R.id.textInput_dateEdit);
-            TextView pdfMeno = (TextView) findViewById(R.id.textInput_pdf_meno);
 
             User u = (User) extras.get("currentUser");
 
@@ -126,6 +133,8 @@ public class EditUserActivity extends AppCompatActivity {
 
                     Requests objekt = new Requests();
 
+                    Log.i("url", urlString);
+
                     String response = objekt.OTHER_request("PUT", urlString);
 
                     int responseCode = Integer.parseInt(response);
@@ -193,29 +202,47 @@ public class EditUserActivity extends AppCompatActivity {
             });
 
             Button zivotopisTlacidlo = (Button) findViewById(R.id.button_PDF);
+            if(u.getCompanyID() != -1) {
+                zivotopisTlacidlo.setVisibility(View.INVISIBLE);
+                zivotopisTlacidlo.setVisibility(View.GONE);
+            }
+
+            final int READ_EXTERNAL_STORAGE = 112;
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, READ_EXTERNAL_STORAGE);
+            } else {
+                Log.i("Permission", "Permissions were granted.");
+            }
+
+
+            ActivityResultLauncher<String> mGetContent = registerForActivityResult(new ActivityResultContracts.GetContent(),
+                    new ActivityResultCallback<Uri>() {
+                        @Override
+                        public void onActivityResult(Uri uri) {
+                            Requests objekt = new Requests();
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                if(objekt.PDF_POST_request(uri.getPath(), "/postPDF/" + u.getName() + "/" + u.getPassword() + "/") <=200)
+                                    popupMessage("Úspech", "Životopis bol úspešne uverejnený.");
+                                else
+                                    popupMessage("Chyba", "Niekde nastala chyba.");
+                            }
+                            else
+                                popupMessage("Chyba", "Vaša verzia Androidu nepodpruje túto funkcionalitu.");
+                        }
+                    });
 
             zivotopisTlacidlo.setOnClickListener(new View.OnClickListener() {
+
                 @RequiresApi(api = Build.VERSION_CODES.O)
                 @Override
                 public void onClick(View v) {
 
                     if(u.getCompanyID() != -1){
-                        popupMessage("Chyba!", "Životopis si môžu pridať iba zamestnanci.");
+                        popupMessage("Chyba!", "Životopis môžu uverejniť iba zamestnanci.");
                         return;
                     }
 
-
-                    Requests objekt = new Requests();
-                    if(pdfMeno.getText().toString().length() > 0) {
-                        String pdfMenoString = pdfMeno.getText().toString();
-                        int responseCode = objekt.PDF_POST_request(pdfMenoString, "/postPDF/" + u.getName() + "/" + u.getPassword() + "/");
-                        Log.i("Response code", String.valueOf(responseCode));
-                    }
-                    else {
-                        popupMessage("Chyba", "Zadajte názov súboru PDF\n" +
-                                "(nezadávajte koncovku .pdf)");
-                    }
-
+                    mGetContent.launch("application/pdf");
                 }
             });
 
@@ -223,7 +250,7 @@ public class EditUserActivity extends AppCompatActivity {
             ziadostiTlacidlo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent i = new Intent(EditUserActivity.this, HomeActivity.class); //---
+                    Intent i = new Intent(EditUserActivity.this, HomeActivity.class);
                     i.putExtra("currentUser", u);
                     startActivity(i);
 
