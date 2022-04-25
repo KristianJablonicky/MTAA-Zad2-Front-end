@@ -1,11 +1,19 @@
 package mtaa.java;
 
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import android.view.View;
 
@@ -18,7 +26,8 @@ import android.widget.EditText;
 
 import org.json.JSONObject;
 
-import java.io.Serializable;
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
@@ -38,9 +47,38 @@ public class MainActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
+    private boolean checkPermission() {
+        // checking of permissions.
+        int permission1 = ContextCompat.checkSelfPermission(getApplicationContext(), WRITE_EXTERNAL_STORAGE);
+        int permission2 = ContextCompat.checkSelfPermission(getApplicationContext(), READ_EXTERNAL_STORAGE);
+        return permission1 == PackageManager.PERMISSION_GRANTED && permission2 == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void requestPermission() {
+        // requesting permissions if not provided.
+        final int PERMISSION_REQUEST_CODE = 200;
+        ActivityCompat.requestPermissions(this, new String[]{WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
+    }
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // ziskanie povoleni od pouzivatela
+        final int READ_EXTERNAL_STORAGE = 112;
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, READ_EXTERNAL_STORAGE);
+        } else {
+            Log.i("Permission", "uz boli udelene");
+        }
+
+        if (checkPermission()) {
+            Log.i("Permission", "GRANTED");
+        } else {
+            requestPermission();
+        }
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -75,13 +113,6 @@ public class MainActivity extends AppCompatActivity {
                         Intent i = new Intent(MainActivity.this, HomeActivity.class);
                         i.putExtra("currentUser", u);
                         startActivity(i);
-
-                        //Log.i("name", u.getName());
-                        //Log.i("pass",u.getPassword());
-                        //Log.i("phone",u.getPhone());
-                        //Log.i("email",u.getEmail());
-                        //Log.i("bday", String.valueOf(u.getBirthday()));
-
                     }
                     catch (Exception e)
                     {
