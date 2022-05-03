@@ -109,10 +109,8 @@ public class JobOfferActivity extends AppCompatActivity {
             {
                 name.setText(j.getName());
                 field.setText(j.getField());
-
                 if (j.getSalary() == -1) salary.setText("");
-                else salary.setText(j.getSalary().toString());
-
+                    else salary.setText(j.getSalary().toString());
                 hours.setText(j.getWorking_hours());
                 location.setText(j.getLocation());
                 detail.setText(j.getDetail());
