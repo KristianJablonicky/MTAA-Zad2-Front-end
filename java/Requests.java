@@ -200,6 +200,7 @@ class Requests {
             }
             catch (Exception e) {
                 e.printStackTrace();
+                return "408";
             }
         }
         else
@@ -252,8 +253,10 @@ class Requests {
         try {
             response = client.newCall(request).execute();
 
-            if (response.body().contentLength() != -1) // pouzivatel nema zverejneny zivotopis
+            if (response.body().contentLength() != -1){ // pouzivatel nema zverejneny zivotopis
+                response.close();
                 return false;
+            }
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
@@ -296,9 +299,9 @@ class Requests {
         final MediaType CONTENT_TYPE = MediaType.parse("application/json");
 
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
-        builder.connectTimeout(20, TimeUnit.SECONDS);
-        builder.readTimeout(20, TimeUnit.SECONDS);
-        builder.writeTimeout(20, TimeUnit.SECONDS);
+        builder.connectTimeout(10, TimeUnit.SECONDS);
+        builder.readTimeout(10, TimeUnit.SECONDS);
+        builder.writeTimeout(10, TimeUnit.SECONDS);
 
         OkHttpClient client = builder.build();
         final Request request = new Request.Builder()
