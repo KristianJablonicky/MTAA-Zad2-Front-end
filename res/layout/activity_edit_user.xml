@@ -51,14 +51,14 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/button_ziadosti"
+        android:id="@+id/button_editGoOnline"
         android:layout_width="325dp"
         android:layout_height="46dp"
 
-        android:layout_marginBottom="116dp"
+        android:layout_marginBottom="110dp"
         android:backgroundTint="@color/orange"
         android:onClick="log_in"
-        android:text="Žiadosti"
+        android:text="Obnoviť pripojenie"
         android:textColor="#FFFFFF"
         android:textStyle="bold"
         app:iconPadding="10dp"
@@ -72,7 +72,6 @@
         android:layout_width="127dp"
         android:layout_height="81dp"
 
-        android:layout_marginTop="47dp"
         android:layout_marginBottom="16dp"
         android:backgroundTint="@color/light_red"
         android:onClick="log_in"
@@ -83,16 +82,13 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.827"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_ziadosti"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/button_logout"
         android:layout_width="127dp"
         android:layout_height="81dp"
 
-        android:layout_marginTop="47dp"
         android:layout_marginBottom="16dp"
         android:backgroundTint="@color/light_red"
         android:onClick="log_in"
@@ -103,9 +99,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/button_odstran"
         app:layout_constraintHorizontal_bias="0.342"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_ziadosti"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/button_save"
