@@ -2,7 +2,6 @@ package mtaa.java;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.Barrier;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.DialogInterface;
@@ -23,7 +22,6 @@ import android.widget.TextView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.function.Predicate;
@@ -68,6 +66,8 @@ public class HomeActivity extends AppCompatActivity {
         Button sucasnePonuky = (Button) findViewById(R.id.BsucasneP);
         ImageButton vytvoreniePonuky = (ImageButton) findViewById(R.id.BVytvorenieP);
 
+        Requests request = new Requests();
+
         ListView list = (ListView) findViewById(R.id.LWsearch);
         SearchAdapter customAdapter = new SearchAdapter(this);
         list.setAdapter(customAdapter);
@@ -79,6 +79,7 @@ public class HomeActivity extends AppCompatActivity {
         {
             User u = (User) extras.get("currentUser");
             username.setText(u.getName());
+            Log.i("Birthday", String.valueOf(u.getBirthday()));
 
             if (!u.isEmployer())
             {
@@ -171,7 +172,7 @@ public class HomeActivity extends AppCompatActivity {
                     }
                     else URLstring = "/searchJobOffers/";
 
-                    JSONArray vysledok = Requests.GET_requestARRAY(URLstring);
+                    JSONArray vysledok = request.GET_requestARRAY(URLstring);
 
                     try
                     {
@@ -216,7 +217,7 @@ public class HomeActivity extends AppCompatActivity {
                         customAdapter.notifyDataSetChanged();
                     }
                     catch(Exception e) {
-                            e.printStackTrace();
+                        e.printStackTrace();
                     }
 
                 }
@@ -237,7 +238,7 @@ public class HomeActivity extends AppCompatActivity {
 
                     String URLstring = "/getAllJobOffers/" + u.getId() + "/";
 
-                    JSONArray vysledok = Requests.GET_requestARRAY(URLstring);
+                    JSONArray vysledok = request.GET_requestARRAY(URLstring);
 
                     try
                     {
