@@ -69,10 +69,7 @@ public class ViewUserActivity extends AppCompatActivity {
                         company.setText(spolocnostString);
                     }
                     if (viewCiel.getBirthday() != null) {
-
-                        Format formatter = new SimpleDateFormat("yyyy-MM-dd");
-                        String dateString = formatter.format(viewCiel.getBirthday());
-                        date.setText(dateString);
+                        date.setText(viewCiel.getBirthday());
                     }
 
                 } catch (Exception e) {
