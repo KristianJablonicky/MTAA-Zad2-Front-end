@@ -23,12 +23,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import org.json.JSONObject;
-import java.text.Format;
-import java.text.SimpleDateFormat;
-
-
-
 
 import mtaa.java.data.User;
 
@@ -47,6 +41,23 @@ public class EditUserActivity extends AppCompatActivity {
         });
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
+    }
+
+    private void uploadPDF(Uri uri, User u) {
+        if(!u.isOffline()) {
+            Requests objekt = new Requests();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                if (objekt.PDF_POST_request(uri.getPath(), "/postPDF/" + u.getName() + "/" + u.getPassword() + "/") <= 200)
+                    popupMessage("Úspech", "Životopis bol úspešne uverejnený.");
+                else
+                    popupMessage("Chyba", "Niekde nastala chyba.");
+            } else
+                popupMessage("Chyba", "Vaša verzia Androidu nepodpruje túto funkcionalitu.");
+        }
+        else{
+            u.setZivotopisURI(uri);
+            popupMessage("Info:", "Zvolený súbor sa uverejní, až keď obnovíte pripojenie.");
+        }
     }
 
     @Override
@@ -73,9 +84,13 @@ public class EditUserActivity extends AppCompatActivity {
             if (u.getPhone() != null)
                 phone.setHint(u.getPhone());
             if (u.getBirthday() != null) {
-                Format formatter = new SimpleDateFormat("yyyy-MM-dd");
-                String dateString = formatter.format(u.getBirthday());
-                date.setHint(dateString);
+                date.setHint(u.getBirthday());
+            }
+
+            Button goOnlineTlacidlo = (Button) findViewById(R.id.button_editGoOnline);
+            if(!u.isOffline()){ //tlacidlo na obnovenie pripojenia je viditelne iba ak je pouzivatel offline
+                goOnlineTlacidlo.setVisibility(View.INVISIBLE);
+                goOnlineTlacidlo.setVisibility(View.GONE);
             }
 
             Button saveTlacidlo = (Button) findViewById(R.id.button_save);
@@ -94,6 +109,9 @@ public class EditUserActivity extends AppCompatActivity {
                     } else {
                         urlString = "/putEmployer/" + u.getName() + "/" + u.getPassword() + "/";
                     }
+
+                    if(!u.isOffline()) // najaktualnejsie udaje pouzivatela pred potencialnym odpojenim
+                        u.setPovodnyURL(urlString);
 
                     EditText menoInput = (EditText) findViewById(R.id.textInput_menoEdit);
                     String meno = menoInput.getText().toString();
@@ -135,38 +153,42 @@ public class EditUserActivity extends AppCompatActivity {
 
                     Log.i("url", urlString);
 
-                    String response = objekt.OTHER_request("PUT", urlString);
+                    String response = null;
+                    if(!u.isOffline()){
+                        response = objekt.OTHER_request("PUT", urlString);
+                        int responseCode = Integer.parseInt(response);
 
-                    int responseCode = Integer.parseInt(response);
-
-                    if (responseCode >= 400) {
-                        //popupMessage("Chyba!", "Pri aktualizovaní údajov došlo ku chybe");
-                        popupMessage("Chyba", "HTTP error kod: " + response);
-                    } else {
-                        //popupMessage("Úspech", "Vaše údaje boli pspešne nahrané do databázy.");
-                        popupMessage("Úspech", "HTTP kod: " + response);
-                    }
-                    //--aktualizacia objektu User
-
-                    JSONObject pouzivatel = Requests.GET_request("/getUser/" + meno + "/" + heslo + "/");
-
-                    if (pouzivatel == null) {
-                        popupMessage("Chyba!", "Nesprávne meno alebo heslo.");
-                    } else {
-                        Log.i("vysledok", pouzivatel.toString());
-                        try {
-                            User u = new User(pouzivatel);
-                            Intent i = new Intent(EditUserActivity.this, EditUserActivity.class);
-                            i.putExtra("currentUser", u);
-                            startActivity(i);
-
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                        if (responseCode >= 400) {
+                            if (responseCode == 408){
+                                goOnlineTlacidlo.setVisibility(View.VISIBLE);
+                                u.setOfflineMode(true);
+                                popupMessage("Chyba", "Nepodarilo sa nadviazať konverzáciu so serverom.\n" +
+                                        "Zapína sa offline mód.");
+                            }
+                            else
+                                popupMessage("Chyba", "HTTP error kod: " + response);
+                        } else {
+                            //popupMessage("Úspech", "Vaše údaje boli pspešne nahrané do databázy.");
+                            popupMessage("Úspech", "HTTP kod: " + response);
                         }
                     }
+                    else {
+                        popupMessage("Info:", "Ste v offline móde, skúste najskôr obnoviť pripojenie.\n" +
+                                "Po úspešnom obnovení sa vaše zmeny automaticky nahrajú na server.");
+                    }
 
-                    Log.i("response", String.valueOf(response));
+                    //--aktualizacia objektu User
 
+                    if (meno.length()>0)
+                        u.setName(meno);
+                    if(heslo.length()>0)
+                        u.setPassword(heslo);
+                    if(email.length()>0)
+                        u.setEmail(email);
+                    if(phone.length()>0)
+                        u.setPhone(phone);
+                    if(date.length()>0)
+                        u.setBirthday(date);
                 }
 
             });
@@ -175,7 +197,10 @@ public class EditUserActivity extends AppCompatActivity {
             logoutlacidlo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    startActivity(new Intent(EditUserActivity.this, MainActivity.class));
+                    if(!u.isOffline())
+                        startActivity(new Intent(EditUserActivity.this, MainActivity.class));
+                    else
+                        popupMessage("Chyba", "Ste v offline režime.");
                 }
             });
 
@@ -183,20 +208,22 @@ public class EditUserActivity extends AppCompatActivity {
             odstranitTlacidlo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    if(!u.isOffline()) {
+                        Requests objekt = new Requests();
+                        String type = "E";
+                        if (u.getCompanyID() == -1)
+                            type = "W";
 
-                    Requests objekt = new Requests();
-                    String type = "E";
-                    if(u.getCompanyID() == -1)
-                        type = "W";
-
-                    String vysledok = objekt.OTHER_request("DELETE","/delUser/" + type + "/" + u.getName() + "/" + u.getPassword() + "/");
-                    int responseCode = Integer.parseInt(vysledok);
-                    if(responseCode >= 400){
-                        //popupMessage("Chyba!", "Pri odstraňovaní používateľa z databázy došlo ku chybe");
-                        popupMessage("Chyba!", "HTTP erroe kod: " + vysledok);
+                        String vysledok = objekt.OTHER_request("DELETE", "/delUser/" + type + "/" + u.getName() + "/" + u.getPassword() + "/");
+                        int responseCode = Integer.parseInt(vysledok);
+                        if (responseCode >= 400) {
+                            popupMessage("Chyba!", "HTTP error kod: " + vysledok);
+                        } else {
+                            startActivity(new Intent(EditUserActivity.this, MainActivity.class));
+                        }
                     }
                     else{
-                        startActivity(new Intent(EditUserActivity.this, MainActivity.class));
+                        popupMessage("Chyba", "Ste v offline režime, ak si chcete naozaj odstrániť účet tak obnovte svoje pripojenie.");
                     }
                 }
             });
@@ -219,15 +246,7 @@ public class EditUserActivity extends AppCompatActivity {
                     new ActivityResultCallback<Uri>() {
                         @Override
                         public void onActivityResult(Uri uri) {
-                            Requests objekt = new Requests();
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                if(objekt.PDF_POST_request(uri.getPath(), "/postPDF/" + u.getName() + "/" + u.getPassword() + "/") <=200)
-                                    popupMessage("Úspech", "Životopis bol úspešne uverejnený.");
-                                else
-                                    popupMessage("Chyba", "Niekde nastala chyba.");
-                            }
-                            else
-                                popupMessage("Chyba", "Vaša verzia Androidu nepodpruje túto funkcionalitu.");
+                            uploadPDF(uri, u);
                         }
                     });
 
@@ -246,13 +265,59 @@ public class EditUserActivity extends AppCompatActivity {
                 }
             });
 
-            Button ziadostiTlacidlo = (Button) findViewById(R.id.button_ziadosti);
-            ziadostiTlacidlo.setOnClickListener(new View.OnClickListener() {
+            goOnlineTlacidlo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent i = new Intent(EditUserActivity.this, HomeActivity.class);
-                    i.putExtra("currentUser", u);
-                    startActivity(i);
+
+                    if(Requests.GET_request("/findUsers/") == null){
+                        popupMessage("Chyba", "Nepodarilo sa obnoviť pripojenie ku serveru.");
+                        return;
+                    }
+                    u.setOfflineMode(false);
+                    goOnlineTlacidlo.setVisibility(View.INVISIBLE);
+                    goOnlineTlacidlo.setVisibility(View.GONE);
+
+                    String urlString = u.getPovodnyURL();
+                    urlString += "name=" + u.getName() + "/";
+                    urlString += "password=" + u.getPassword() + "/";
+                    if (u.getBirthday().length() > 0) {
+                        urlString += "date=" + u.getBirthday() + "/";
+                    }
+                    if (u.getEmail().length() > 0) {
+                        urlString += "email=" + u.getEmail() + "/";
+                    }
+
+                    if (u.getPhone().length() > 0) {
+                        urlString += "phone=" + u.getPhone() + "/";
+                    }
+
+                    String odpoved = "Pripojenie bolo úspešne obnovené.";
+                    String response = Requests.OTHER_request("PUT", urlString);
+                    int responseCode = Integer.parseInt(response);
+
+                    if (responseCode >= 400) {
+                        odpoved += "\nVaše údaje zadané v offline móde sa nomohli nahrať na server.";
+                        if(responseCode == 403)
+                            popupMessage("Chyba", "Meno zadané v offline móde už existuje, zmeny vašich údajov neboli nahrané.");
+                        else popupMessage("Chyba", "HTTP error kod: " + response);
+
+                        if (responseCode == 408){
+                            goOnlineTlacidlo.setVisibility(View.VISIBLE);
+                            u.setOfflineMode(true);
+                            return;
+                        }
+                    } else {
+                        odpoved += "\nVaše údaje zadané v offline móde sa úspešne nahrali na server.";
+                    }
+                    if(u.getZivotopisURI() != null)
+                        odpoved += "\nŽivotopis bol úspešne zverejnený.";
+
+                    popupMessage("Úspech", odpoved);
+
+                    if(u.getZivotopisURI() != null)
+                        uploadPDF(u.getZivotopisURI(), u);
+                    u.setZivotopisURI(null); // nabuduce sa uz zivotopis nemusi uploadovat
+
 
                 }
             });
@@ -263,7 +328,6 @@ public class EditUserActivity extends AppCompatActivity {
                     Intent i = new Intent(EditUserActivity.this, HomeActivity.class);
                     i.putExtra("currentUser", u);
                     startActivity(i);
-
                 }
             });
         }
