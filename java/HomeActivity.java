@@ -319,6 +319,8 @@ public class HomeActivity extends AppCompatActivity {
 
                     String odpoved = "Pripojenie bolo úspešne obnovené.";
 
+                    u.setOfflineMode(false);
+
                     if (u.getPovodneUdaje() != null)
                     {
                         String urlString;
@@ -331,14 +333,14 @@ public class HomeActivity extends AppCompatActivity {
                         if (!parts[0].equals(u.getName())) urlString += "name=" + u.getName() + "/";
                         if (!parts[1].equals(u.getPassword())) urlString += "password=" + u.getPassword() + "/";
 
-                        if (u.getBirthday().length() > 0) {
+                        if (u.getBirthday() != null) {
                             urlString += "date=" + u.getBirthday() + "/";
                         }
-                        if (u.getEmail().length() > 0) {
+                        if (u.getEmail() != null) {
                             urlString += "email=" + u.getEmail() + "/";
                         }
 
-                        if (u.getPhone().length() > 0) {
+                        if (u.getPhone() != null) {
                             urlString += "phone=" + u.getPhone() + "/";
                         }
 
@@ -371,6 +373,7 @@ public class HomeActivity extends AppCompatActivity {
                         else
                         {
                             popupMessage(res[0], res[1]);
+                            u.setOfflineMode(true);
                             return;
                         }
 
@@ -379,12 +382,12 @@ public class HomeActivity extends AppCompatActivity {
                     Integer failed = u.executeURLs();
                     if (!failed.equals(0))
                     {
-                        popupMessage("Chyba", "Nepodarilo sa ulozit ponuky. Pocet neuspesnych pokusov = " + failed);
+                        popupMessage("Chyba", "Nepodarilo sa uložiť vytvorené pracovné ponuky." +
+                                "Počet neúspešných pokusov = " + failed);
+                        u.setOfflineMode(true);
                         return;
                     }
-                    else odpoved += "\nVsetky pracovne ponuky boli aktualizovane.";
-
-                    u.setOfflineMode(false);
+                    else odpoved += "\nVšetky pracovné ponuky boli aktualizované.";
                     onlineButton.setVisibility(View.INVISIBLE);
                     popupMessage("Úspech", odpoved);
                 }
