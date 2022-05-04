@@ -170,7 +170,7 @@ public class User implements Serializable {
                     URLstring = "/postJobOffer/" + this.getName() + "/" + this.getPassword() + "/";
                     URLstring += j.getName() + "/" + j.getField() + "/";
 
-                    if (!j.getSalary().equals("")) URLstring += "salary=" + j.getSalary() + "/";
+                    if (!j.getSalary().equals(-1)) URLstring += "salary=" + j.getSalary() + "/";
                     if (!j.getWorking_hours().equals("")) URLstring += "hours=" + j.getWorking_hours() + "/";
                     if (!j.getLocation().equals("")) URLstring += "location=" + j.getLocation() + "/";
                     if (!j.getDetail().equals("")) URLstring += "detail=" + j.getDetail() + "/";
