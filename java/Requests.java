@@ -34,14 +34,15 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-class Requests {
+public class Requests {
 
-    //static private String IP = "10.10.37.255";   //MATUS-IP
-    static private String IP = "192.168.219.127"; //KRISTIAN-IP
+    static private String IP = "10.10.37.255";   //MATUS-IP
+    //static private String IP = "192.168.219.127"; //KRISTIAN-IP
     static private String PORT = ":8000";
 
     //static private String filePath = "sdcard/Download/"; // emulator
     static private String filePath = "storage/emulated/0/Download/"; // android zariadenie
+
 
 
     //https://stackoverflow.com/questions/4308554/simplest-way-to-read-json-from-a-url-in-java
@@ -177,7 +178,7 @@ class Requests {
         //necessary for performing network operations
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
-        if (type == "POST" || type == "PUT" || type == "DELETE")
+        if (type.equals("POST") || type.equals("PUT") || type.equals("DELETE"))
         {
             HttpURLConnection con;
 

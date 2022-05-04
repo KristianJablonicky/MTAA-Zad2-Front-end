@@ -43,21 +43,11 @@ public class EditUserActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
-    private void uploadPDF(Uri uri, User u) {
-        if(!u.isOffline()) {
-            Requests objekt = new Requests();
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                if (objekt.PDF_POST_request(uri.getPath(), "/postPDF/" + u.getName() + "/" + u.getPassword() + "/") <= 200)
-                    popupMessage("Úspech", "Životopis bol úspešne uverejnený.");
-                else
-                    popupMessage("Chyba", "Niekde nastala chyba.");
-            } else
-                popupMessage("Chyba", "Vaša verzia Androidu nepodpruje túto funkcionalitu.");
-        }
-        else{
-            u.setZivotopisURI(uri);
-            popupMessage("Info:", "Zvolený súbor sa uverejní, až keď obnovíte pripojenie.");
-        }
+    private void uploadPDF(Uri uri, User u)
+    {
+        String [] response = u.uploadPDF(uri);
+
+        popupMessage(response[0], response[1]);
     }
 
     @Override
@@ -69,49 +59,35 @@ public class EditUserActivity extends AppCompatActivity {
 
         if (extras != null) {
 
-            TextView meno = (TextView) findViewById(R.id.textInput_menoEdit);
-            TextView heslo = (TextView) findViewById(R.id.textInput_hesloEdit);
-            TextView email = (TextView) findViewById(R.id.textInput_emailEdit);
-            TextView phone = (TextView) findViewById(R.id.textInput_phoneEdit);
-            TextView date = (TextView) findViewById(R.id.textInput_dateEdit);
+            TextView menoView = (TextView) findViewById(R.id.textInput_menoEdit);
+            TextView hesloView = (TextView) findViewById(R.id.textInput_hesloEdit);
+            TextView emailView = (TextView) findViewById(R.id.textInput_emailEdit);
+            TextView phoneView = (TextView) findViewById(R.id.textInput_phoneEdit);
+            TextView dateView = (TextView) findViewById(R.id.textInput_dateEdit);
 
             User u = (User) extras.get("currentUser");
 
-            meno.setHint(u.getName());
-            heslo.setHint(u.getPassword());
+            menoView.setHint(u.getName());
+            hesloView.setHint(u.getPassword());
             if (u.getEmail() != null)
-                email.setHint(u.getEmail());
+                emailView.setHint(u.getEmail());
             if (u.getPhone() != null)
-                phone.setHint(u.getPhone());
+                phoneView.setHint(u.getPhone());
             if (u.getBirthday() != null) {
-                date.setHint(u.getBirthday());
-            }
-
-            Button goOnlineTlacidlo = (Button) findViewById(R.id.button_editGoOnline);
-            if(!u.isOffline()){ //tlacidlo na obnovenie pripojenia je viditelne iba ak je pouzivatel offline
-                goOnlineTlacidlo.setVisibility(View.INVISIBLE);
-                goOnlineTlacidlo.setVisibility(View.GONE);
+                dateView.setHint(u.getBirthday());
             }
 
             Button saveTlacidlo = (Button) findViewById(R.id.button_save);
             saveTlacidlo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    // najaktualnejsie udaje pouzivatela pred potencialnym odpojenim
+                    if(!u.isOffline()) u.setPovodneUdaje(u.getName() + "/" + u.getPassword());
 
-                    String urlString = null;
+                    String urlString;
 
-                    boolean zamestnavatel = true;
-                    if (u.getCompanyID() == -1)
-                        zamestnavatel = false;
-
-                    if (!zamestnavatel) {
-                        urlString = "/putWorker/" + u.getName() + "/" + u.getPassword() + "/";
-                    } else {
-                        urlString = "/putEmployer/" + u.getName() + "/" + u.getPassword() + "/";
-                    }
-
-                    if(!u.isOffline()) // najaktualnejsie udaje pouzivatela pred potencialnym odpojenim
-                        u.setPovodnyURL(urlString);
+                    if (!u.isEmployer()) urlString = "/putWorker/" + u.getName() + "/" + u.getPassword() + "/";
+                    else urlString = "/putEmployer/" + u.getName() + "/" + u.getPassword() + "/";
 
                     EditText menoInput = (EditText) findViewById(R.id.textInput_menoEdit);
                     String meno = menoInput.getText().toString();
@@ -147,50 +123,53 @@ public class EditUserActivity extends AppCompatActivity {
                         urlString += "phone=" + phone + "/";
                     }
 
+                    // aktualizacia objektu User
+                    if (meno.length()>0)  u.setName(meno);
+                    if (heslo.length()>0) u.setPassword(heslo);
+                    if (email.length()>0) u.setEmail(email);
+                    if (phone.length()>0) u.setPhone(phone);
+                    if (date.length()>0) u.setBirthday(date);
+
+                    menoView.setText("");
+                    hesloView.setText("");
+                    emailView.setText("");
+                    phoneView.setText("");
+                    dateView.setText("");
+
+                    menoView.setHint(u.getName());
+                    hesloView.setHint(u.getPassword());
+                    if (u.getEmail() != null) emailView.setHint(u.getEmail());
+                    if (u.getPhone() != null) phoneView.setHint(u.getPhone());
+                    if (u.getBirthday() != null) dateView.setHint(u.getBirthday());
+
+
                     //inputy nacitane, ide sa poslat request
-
-                    Requests objekt = new Requests();
-
                     Log.i("url", urlString);
 
-                    String response = null;
-                    if(!u.isOffline()){
-                        response = objekt.OTHER_request("PUT", urlString);
+                    if (!u.isOffline())
+                    {
+                        String response = Requests.OTHER_request("PUT", urlString);
                         int responseCode = Integer.parseInt(response);
 
-                        if (responseCode >= 400) {
-                            if (responseCode == 408){
-                                goOnlineTlacidlo.setVisibility(View.VISIBLE);
+                        if (responseCode >= 400)
+                        {
+                            if (responseCode == 408)
+                            {
                                 u.setOfflineMode(true);
-                                popupMessage("Chyba", "Nepodarilo sa nadviazať konverzáciu so serverom.\n" +
-                                        "Zapína sa offline mód.");
+                                popupMessage("Chyba", "Nepodarilo sa nadviazať konverzáciu so serverom.\n" + "Zapína sa offline mód.");
                             }
-                            else
-                                popupMessage("Chyba", "HTTP error kod: " + response);
-                        } else {
-                            //popupMessage("Úspech", "Vaše údaje boli pspešne nahrané do databázy.");
-                            popupMessage("Úspech", "HTTP kod: " + response);
+                            else popupMessage("Chyba", "HTTP error kod: " + response);
                         }
+                        else popupMessage("Úspech", "HTTP kod: " + response);
                     }
+
+                    /*
                     else {
                         popupMessage("Info:", "Ste v offline móde, skúste najskôr obnoviť pripojenie.\n" +
                                 "Po úspešnom obnovení sa vaše zmeny automaticky nahrajú na server.");
                     }
-
-                    //--aktualizacia objektu User
-
-                    if (meno.length()>0)
-                        u.setName(meno);
-                    if(heslo.length()>0)
-                        u.setPassword(heslo);
-                    if(email.length()>0)
-                        u.setEmail(email);
-                    if(phone.length()>0)
-                        u.setPhone(phone);
-                    if(date.length()>0)
-                        u.setBirthday(date);
+                    */
                 }
-
             });
 
             Button logoutlacidlo = (Button) findViewById(R.id.button_logout);
@@ -265,62 +244,6 @@ public class EditUserActivity extends AppCompatActivity {
                 }
             });
 
-            goOnlineTlacidlo.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    if(Requests.GET_request("/findUsers/") == null){
-                        popupMessage("Chyba", "Nepodarilo sa obnoviť pripojenie ku serveru.");
-                        return;
-                    }
-                    u.setOfflineMode(false);
-                    goOnlineTlacidlo.setVisibility(View.INVISIBLE);
-                    goOnlineTlacidlo.setVisibility(View.GONE);
-
-                    String urlString = u.getPovodnyURL();
-                    urlString += "name=" + u.getName() + "/";
-                    urlString += "password=" + u.getPassword() + "/";
-                    if (u.getBirthday().length() > 0) {
-                        urlString += "date=" + u.getBirthday() + "/";
-                    }
-                    if (u.getEmail().length() > 0) {
-                        urlString += "email=" + u.getEmail() + "/";
-                    }
-
-                    if (u.getPhone().length() > 0) {
-                        urlString += "phone=" + u.getPhone() + "/";
-                    }
-
-                    String odpoved = "Pripojenie bolo úspešne obnovené.";
-                    String response = Requests.OTHER_request("PUT", urlString);
-                    int responseCode = Integer.parseInt(response);
-
-                    if (responseCode >= 400) {
-                        odpoved += "\nVaše údaje zadané v offline móde sa nomohli nahrať na server.";
-                        if(responseCode == 403)
-                            popupMessage("Chyba", "Meno zadané v offline móde už existuje, zmeny vašich údajov neboli nahrané.");
-                        else popupMessage("Chyba", "HTTP error kod: " + response);
-
-                        if (responseCode == 408){
-                            goOnlineTlacidlo.setVisibility(View.VISIBLE);
-                            u.setOfflineMode(true);
-                            return;
-                        }
-                    } else {
-                        odpoved += "\nVaše údaje zadané v offline móde sa úspešne nahrali na server.";
-                    }
-                    if(u.getZivotopisURI() != null)
-                        odpoved += "\nŽivotopis bol úspešne zverejnený.";
-
-                    popupMessage("Úspech", odpoved);
-
-                    if(u.getZivotopisURI() != null)
-                        uploadPDF(u.getZivotopisURI(), u);
-                    u.setZivotopisURI(null); // nabuduce sa uz zivotopis nemusi uploadovat
-
-
-                }
-            });
             Button spatTlacidlo = (Button) findViewById(R.id.button_edit_back);
             spatTlacidlo.setOnClickListener(new View.OnClickListener() {
                 @Override

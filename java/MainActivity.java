@@ -110,7 +110,6 @@ public class MainActivity extends AppCompatActivity {
                     {
                         User u = new User(pouzivatel);
                         u.setOfflineMode(false);
-                        u.setPovodnyURL(null);
 
                         Intent i = new Intent(MainActivity.this, HomeActivity.class);
                         i.putExtra("currentUser", u);

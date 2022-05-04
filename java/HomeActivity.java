@@ -24,6 +24,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import org.json.JSONArray;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
 
 import mtaa.java.data.JobOffer;
@@ -65,8 +66,7 @@ public class HomeActivity extends AppCompatActivity {
         FloatingActionButton searchButton = (FloatingActionButton) findViewById(R.id.Bsearch);
         Button sucasnePonuky = (Button) findViewById(R.id.BsucasneP);
         ImageButton vytvoreniePonuky = (ImageButton) findViewById(R.id.BVytvorenieP);
-
-        Requests request = new Requests();
+        Button onlineButton = (Button) findViewById(R.id.Boffline);
 
         ListView list = (ListView) findViewById(R.id.LWsearch);
         SearchAdapter customAdapter = new SearchAdapter(this);
@@ -79,7 +79,6 @@ public class HomeActivity extends AppCompatActivity {
         {
             User u = (User) extras.get("currentUser");
             username.setText(u.getName());
-            Log.i("Birthday", String.valueOf(u.getBirthday()));
 
             if (!u.isEmployer())
             {
@@ -93,7 +92,30 @@ public class HomeActivity extends AppCompatActivity {
 
                 divider.setLayoutParams(params);
             }
+            else if (!u.isOffline())
+            {
+                String URLstring = "/getAllJobOffers/" + u.getId() + "/";
 
+                JSONArray vysledok = Requests.GET_requestARRAY(URLstring);
+
+                try
+                {
+                    if (vysledok != null) u.clearList();
+
+                    for (int i = 0; i < vysledok.length(); i++)
+                        u.addJob("GET", new JobOffer(vysledok.getJSONObject(i)));
+                }
+                catch (Exception e) {
+                    popupMessage("Error","Pracovné ponuky neboli načítané z databázy.");
+                    u.setOfflineMode(true);
+                    onlineButton.setVisibility(View.VISIBLE);
+                }
+
+            }
+
+            if (!u.isOffline()) onlineButton.setVisibility(View.INVISIBLE);
+
+            //ACTIONS
             nastaveniaTlacidlo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -158,6 +180,12 @@ public class HomeActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
 
+                    if (u.isOffline())
+                    {
+                        popupMessage("Info", "Je zapnutý offline mód. Nemáš prístup k verejným údajom!");
+                        return;
+                    }
+
                     String URLstring;
 
                     if (pouzivateliaRB.isChecked())
@@ -172,7 +200,15 @@ public class HomeActivity extends AppCompatActivity {
                     }
                     else URLstring = "/searchJobOffers/";
 
-                    JSONArray vysledok = request.GET_requestARRAY(URLstring);
+                    JSONArray vysledok = Requests.GET_requestARRAY(URLstring);
+
+                    if (vysledok == null)
+                    {
+                        u.setOfflineMode(true);
+                        onlineButton.setVisibility(View.VISIBLE);
+                        popupMessage("Chyba", "Nepodarilo sa nadviazať konverzáciu so serverom.\n" + "Zapína sa offline mód.");
+                        return;
+                    }
 
                     try
                     {
@@ -236,21 +272,8 @@ public class HomeActivity extends AppCompatActivity {
                     searchBar.setHint(searchSwitch.getText() + " pracovnej ponuky");
 
 
-                    String URLstring = "/getAllJobOffers/" + u.getId() + "/";
-
-                    JSONArray vysledok = request.GET_requestARRAY(URLstring);
-
-                    try
-                    {
-                        ArrayList<JobOffer> listdata = new ArrayList<JobOffer>();
-                        for (int i = 0; i < vysledok.length(); i++) listdata.add(new JobOffer(vysledok.getJSONObject(i)));
-
-                        customAdapter.setOfferList(listdata);
-                        customAdapter.notifyDataSetChanged();
-                    }
-                    catch(Exception e) {
-                        e.printStackTrace();
-                    }
+                    customAdapter.setOfferList(u.getMYoffers());
+                    customAdapter.notifyDataSetChanged();
                 }
             });
 
@@ -284,6 +307,89 @@ public class HomeActivity extends AppCompatActivity {
 
                 }
             });
+
+            onlineButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    if(Requests.GET_request("/findUsers/") == null) {
+                        popupMessage("Chyba", "Nepodarilo sa obnoviť pripojenie ku serveru.");
+                        return;
+                    }
+
+                    String odpoved = "Pripojenie bolo úspešne obnovené.";
+
+                    if (u.getPovodneUdaje() != null)
+                    {
+                        String urlString;
+
+                        if (u.isEmployer()) urlString = "/putEmployer/" + u.getPovodneUdaje() + "/";
+                        else urlString = "/putWorker/" + u.getPovodneUdaje() + "/";
+
+                        String[] parts = u.getPovodneUdaje().split("/");
+
+                        if (!parts[0].equals(u.getName())) urlString += "name=" + u.getName() + "/";
+                        if (!parts[1].equals(u.getPassword())) urlString += "password=" + u.getPassword() + "/";
+
+                        if (u.getBirthday().length() > 0) {
+                            urlString += "date=" + u.getBirthday() + "/";
+                        }
+                        if (u.getEmail().length() > 0) {
+                            urlString += "email=" + u.getEmail() + "/";
+                        }
+
+                        if (u.getPhone().length() > 0) {
+                            urlString += "phone=" + u.getPhone() + "/";
+                        }
+
+                        String response = Requests.OTHER_request("PUT", urlString);
+                        int responseCode = Integer.parseInt(response);
+
+                        if (responseCode >= 400)
+                        {
+                            odpoved = "Vaše údaje o účte sa nemohli nahrať na server.";
+
+                            if (responseCode == 403) odpoved += "\nMeno zadané v offline móde už existuje, zmeny vašich údajov neboli nahrané.";
+                            else odpoved += "\nHTTP error kod: " + response;
+
+                            if (responseCode == 408) odpoved += "\nSpojenie so serverom nebolo nadviazane";
+
+
+                            popupMessage("Chyba", odpoved);
+                            return;
+                        }
+                        else odpoved += "\nVaše údaje zadané v offline móde sa úspešne nahrali na server.";
+
+                    }
+
+                    if (u.getZivotopisURI() != null)
+                    {
+                        String [] res = u.uploadPDF(u.getZivotopisURI());
+                        u.setZivotopisURI(null);
+
+                        if (res[0].equals("Úspech")) odpoved += "\n" + res[1];
+                        else
+                        {
+                            popupMessage(res[0], res[1]);
+                            return;
+                        }
+
+                    }
+
+                    Integer failed = u.executeURLs();
+                    if (!failed.equals(0))
+                    {
+                        popupMessage("Chyba", "Nepodarilo sa ulozit ponuky. Pocet neuspesnych pokusov = " + failed);
+                        return;
+                    }
+                    else odpoved += "\nVsetky pracovne ponuky boli aktualizovane.";
+
+                    u.setOfflineMode(false);
+                    onlineButton.setVisibility(View.INVISIBLE);
+                    popupMessage("Úspech", odpoved);
+                }
+            });
+
 
         }
         else Log.e("ERROR","Screen 'Homepage' could not be initialized.");

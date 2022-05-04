@@ -2,6 +2,7 @@ package mtaa.java.data;
 
 import org.json.JSONObject;
 import java.io.Serializable;
+import java.util.Objects;
 
 public class JobOffer implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -111,5 +112,13 @@ public class JobOffer implements Serializable {
 
     public void setDetail(String detail) {
         this.detail = detail;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof JobOffer)) return false;
+        JobOffer jobOffer = (JobOffer) o;
+        return id.equals(jobOffer.id) && name.equals(jobOffer.name) && employerID.equals(jobOffer.employerID) && field.equals(jobOffer.field) && salary.equals(jobOffer.salary) && working_hours.equals(jobOffer.working_hours) && location.equals(jobOffer.location) && detail.equals(jobOffer.detail);
     }
 }
